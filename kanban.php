@@ -1,14 +1,17 @@
 <?php
+session_start();
 include 'ConexionBD/conexion.php';
 if (isset($_GET['numeroHU'])) {
     $numeroHU = $_GET['numeroHU'];
-
     $consulta = "SELECT * FROM hu WHERE numeroHU = $numeroHU";
     $resultado = $conexion->query($consulta);
 }
 ?>
 
 <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/kanban.css">
+    <script src="drag.js" defer></script>
     <title>CorsolaCorp: Tablero kanban</title>
 </head>
 
@@ -17,82 +20,51 @@ if (isset($_GET['numeroHU'])) {
         <?php include 'Sidebar.html' ?>
         <div id="content-wrapper" class="d-flex flex-column">
             <div id="content">
-                <?php include 'navPrincipal.html' ?>
-                <!-- <?php echo "Número de HU: " . $numeroHU; ?> -->
-                <br><br>
-                <div class="dropzone">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-sm-4" style="background-color: pink">
-                                <br>
-                                <div class="card">
-                                    <div class="card-header text-center">
-                                        <h5 class="card-title">Por hacer</h5>
-                                    </div>
-                                </div>
-                                <hr>
+                <?php include 'navPrincipal.php' ?>
+                <div class="container-fluid">
+                    <div class="board">
+                        <div class="lanes">
+                            <div class="swim-lane" id="todo-lane">
+                                <h3 class="heading">Por hacer</h3>
+                                <p class="task" draggable="true">HU1</p>
+                                <p class="task" draggable="true">HU2</p>
+                                <p class="task" draggable="true">HU3</p>
                             </div>
-                            <div class="col-sm-4">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h5 class="card-title">En progreso</h5>
-                                    </div>
-                                </div>
+
+                            <div class="swim-lane">
+                                <h3 class="heading">Haciendo</h3>
+                                <p class="task" draggable="true">HU4</p>
                             </div>
-                            <div class="col-sm-4">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Hecho</h5>
-                                    </div>
-                                </div>
+
+                            <div class="swim-lane">
+                                <h3 class="heading">Hecho</h3>
+                                <p class="task" draggable="true">HU5</p>
                             </div>
                         </div>
                     </div>
                 </div>
-                <?php
-                // mostrar HU añadida
-                // if ($resultado->num_rows > 0) {
-                //     // Mostrar los datos de la HU
-                //     $fila = $resultado->fetch_assoc();
-                //     echo "Número de HU: " . $fila["numeroHU"] . "<br>";
-                //     echo "Nombre: " . $fila["Nombre"] . "<br>";
-                //     echo "Descripción: " . $fila["Descripcion"] . "<br>";
-                //     echo "PH: " . $fila["PH"] . "<br>";
-                //     echo "Responsable: " . $fila["Responsable"] . "<br>";
-                //     echo "Estado: " . $fila["Estado"] . "<br>";
-                // } else {
-                //     // Mostrar un mensaje si no se encuentra la HU
-                //     echo "No se encontraron datos para la HU con número " . $numeroHU;
-                // } ?>
             </div>
-
-            <footer class="sticky-footer bg-white">
-                <div class="container my-auto">
-                    <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; CorsolaCorp 2024</span>
-                    </div>
-                </div>
-            </footer>
+            <?php
+            // mostrar HU añadida
+            // if ($resultado->num_rows > 0) {
+            //     // Mostrar los datos de la HU
+            //     $fila = $resultado->fetch_assoc();
+            //     echo "Número de HU: " . $fila["numeroHU"] . "<br>";
+            //     echo "Nombre: " . $fila["Nombre"] . "<br>";
+            //     echo "Descripción: " . $fila["Descripcion"] . "<br>";
+            //     echo "PH: " . $fila["PH"] . "<br>";
+            //     echo "Responsable: " . $fila["Responsable"] . "<br>";
+            //     echo "Estado: " . $fila["Estado"] . "<br>";
+            // } else {
+            //     // Mostrar un mensaje si no se encuentra la HU
+            //     echo "No se encontraron datos para la HU con número " . $numeroHU;
+            // } 
+            ?>
         </div>
+
+
     </div>
 
-    <!-- Cerrar sesión-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">¿Cerrar sesión?</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="login.html">Logout</a>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Agrega la biblioteca jQuery y jQuery UI -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

@@ -70,3 +70,26 @@ if ($resultadoSprint->num_rows > 0) {
                                     </div>
                                 </div>
                             </div>
+
+
+
+                            <div class="board">
+                        <div class="lanes">
+                            <div class="swim-lane" id="todo-lane">
+                                <h3 class="heading">Por hacer</h3>
+                                <p class="task" draggable="true">HU1</p>
+                                <p class="task" draggable="true">HU2</p>
+                                <p class="task" draggable="true">HU3</p>
+                            </div>
+
+                            <div class="swim-lane">
+                                <h3 class="heading">Haciendo</h3>
+                                <p class="task" draggable="true">HU4</p>
+                            </div>
+
+                            <div class="swim-lane">
+                                <h3 class="heading">Hecho</h3>
+                                <p class="task" draggable="true">HU5</p>
+                            </div>
+                        </div>
+                    </div>

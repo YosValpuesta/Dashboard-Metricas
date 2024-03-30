@@ -6,7 +6,7 @@
     $resultado = $conexion->query($historiasUsuario);
 
     if ($resultado) { 
-        Header("Location: ../index.php");
+        Header("Location: ../Backlog.php");
     } else {
         echo "error";
     }

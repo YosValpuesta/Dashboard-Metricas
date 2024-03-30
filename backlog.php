@@ -1,11 +1,18 @@
 <?php
+session_start();
 include 'ConexionBD/conexion.php';
 $historiasUsuario = "SELECT * FROM hu";
 $resultado = $conexion->query($historiasUsuario);
+$queryUsuarios = "SELECT Usuario FROM usuarios";
+$resultadoUsuarios = $conexion->query($queryUsuarios) or die($conexion->error);
+
+$querySprints = $conexion->query("SELECT TotalSprint FROM tablero") or die($conexion->error);
+$mostrarSprint = mysqli_fetch_array($querySprints);
+$totalSprints = $mostrarSprint['TotalSprint']
 ?>
 
-
 <head>
+    <meta charset="utf-8">
     <title>CorsolaCorp: Backlog</title>
 </head>
 
@@ -14,7 +21,7 @@ $resultado = $conexion->query($historiasUsuario);
         <?php include 'Sidebar.html' ?>
         <div id="content-wrapper" class="d-flex flex-column" style="background-color: #90AFC5;">
             <div id="content">
-                <?php include 'navPrincipal.html' ?>
+                <?php include 'navPrincipal.php' ?>
                 <div class="container">
                     <br>
                     <div class="accordion" id="accordionExample">
@@ -132,8 +139,12 @@ $resultado = $conexion->query($historiasUsuario);
                                 <span class="input-group-text" id="basic-addon1">Responsable</span>
                             </div>
                             <select REQUIRED class="form-control" name="ResponsableHU">
-                                <option selected value="1">1</option>
-                                <option value="2">2</option>
+                                <?php
+                                while ($filaUsuario = $resultadoUsuarios->fetch_assoc()) { ?>
+                                    <option value="<?php echo $filaUsuario['Usuario'] ?>"><?php echo $filaUsuario['Usuario'] ?></option>
+                                <?php
+                                }
+                                ?>
                             </select>
                         </div>
                         <div class="input-group input-group-sm mb-3">
@@ -141,9 +152,9 @@ $resultado = $conexion->query($historiasUsuario);
                                 <span class="input-group-text" id="basic-addon1">Sprint</span>
                             </div>
                             <select REQUIRED class="form-control" name="SprintHU">
+                                <?php for ($i = 1; $i <= $totalSprints; $i++) { ?>
+                                    <option value="<?php echo $i ?>"><?php echo $i ?></option>
                                 <?php
-                                for ($i = 1; $i <= $totalSprint; $i++) {
-                                    echo '<option value="' . $i . '">' . $i . '</option>';
                                 }
                                 ?>
                             </select>
@@ -157,25 +168,5 @@ $resultado = $conexion->query($historiasUsuario);
             </div>
         </div>
     </div>
-
-    <!-- Cerrar sesión-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">¿Cerrar sesión?</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="login.html">Logout</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </body>

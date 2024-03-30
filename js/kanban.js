@@ -1,143 +1,46 @@
-const tarea = {
-    id: '',
-    nombre: '',
-    descripcion: '',
-    responsable: ''
-}
+const draggables = document.querySelectorAll(".task");
+const droppables = document.querySelectorAll(".swim-lane");
 
-let isEditando = false
-let isValido = false
+draggables.forEach((task) => {
+  task.addEventListener("dragstart", () => {
+    task.classList.add("is-dragging");
+  });
+  task.addEventListener("dragend", () => {
+    task.classList.remove("is-dragging");
+  });
+});
 
-function drag(event) {
-    event.dataTransfer.setData("text", event.target.id)
-}
+droppables.forEach((zone) => {
+  zone.addEventListener("dragover", (e) => {
+    e.preventDefault();
 
-function allowDrop(event) {
-    event.preventDefault()
-}
+    const bottomTask = insertAboveTask(zone, e.clientY);
+    const curTask = document.querySelector(".is-dragging");
 
-function drop(event) {
-    event.preventDefault()
-    const data = event.dataTransfer.getData("text")
-    event.currentTarget.appendChild(document.getElementById(data))
-}
-
-function crearTarea(event) {
-    event.preventDefault()
-
-    validarCampos(
-        document.getElementById("tarea-nombre").value,
-        document.getElementById("tarea-descripcion").value
-    )
-
-    if(isValido) {
-        if (isEditando) {
-            const divTarea = document.getElementById(tarea.id)
-            divTarea.childNodes[0].textContent = document.getElementById("tarea-nombre").value
-            divTarea.childNodes[1].textContent = document.getElementById("tarea-descripcion").value
-            divTarea.childNodes[2].textContent = document.getElementById("tarea-responsable").value
-
-            const btnEditar = document.getElementById("btn-crear-editar")
-            btnEditar.value = "Crear Tarea"
-            btnEditar.classList.remove('btn-editar')
-            btnEditar.classList.add('btn-crear')
-        } else {
-            tarea.nombre = document.getElementById("tarea-nombre").value
-            tarea.descripcion = document.getElementById("tarea-descripcion").value
-            tarea.responsable = document.getElementById("tarea-responsable").value
-            registrarTarea()
-        }
-    }
-
-    limpiarCampos()
-    limpiarObj()
-}
-
-function limpiarCampos() {
-    document.getElementById("tarea-nombre").value = ''
-    document.getElementById("tarea-descripcion").value = ''
-    document.getElementById("tarea-responsable").value = ''
-    
-} 
-
-function limpiarObj() {
-    tarea.id = ''
-    tarea.nombre = ''
-    tarea.descripcion = ''
-    tarea.responsable = ''
-
-    isValido = false
-    isEditando = false
-}
-
-function validarCampos(nombre, descripcion) {
-    if (nombre === '' || descripcion === '') {
-        alert('Debes asignar el nombre y la descripción de la tarea')
-        isValido = false
+    if (!bottomTask) {
+      zone.appendChild(curTask);
     } else {
-        isValido = true
+      zone.insertBefore(curTask, bottomTask);
     }
-}
+  });
+});
 
-function registrarTarea() {
-    tarea.id = new Date().getTime()
+const insertAboveTask = (zone, mouseY) => {
+  const els = zone.querySelectorAll(".task:not(.is-dragging)");
 
-    const pendientes = document.getElementById("pendientes")
+  let closestTask = null;
+  let closestOffset = Number.NEGATIVE_INFINITY;
 
-    const divTarea = document.createElement('div')
-    divTarea.classList.add('tarea')
-    divTarea.setAttribute('id', tarea.id)
-    divTarea.setAttribute('draggable', true)
-    divTarea.setAttribute('ondragstart', 'drag(event)')
+  els.forEach((task) => {
+    const { top } = task.getBoundingClientRect();
 
-    const pNombre = document.createElement('p')
-    pNombre.setAttribute('id', 'nombre')
-    pNombre.textContent = tarea.nombre
+    const offset = mouseY - top;
 
-    const pDescripcion = document.createElement('p')
-    pDescripcion.setAttribute('id', 'descripcion')
-    pDescripcion.textContent = tarea.descripcion
-
-    const pResponsable = document.createElement('p')    
-    pResponsable.setAttribute('id', 'responsable')
-    pResponsable.textContent = tarea.responsable
-
-    const inputEditar = document.createElement('input')
-    inputEditar.classList.add('btn-crear')
-    inputEditar.setAttribute('type', 'submit')
-    inputEditar.value = 'Editar'
-    inputEditar.onclick = function() {
-        isEditando = true
-        tarea.id = divTarea.getAttribute('id')
-        tarea.nombre = pNombre.textContent
-        tarea.descripcion = pDescripcion.textContent
-        tarea.responsable = pResponsable.textContent
-        editarTarea()
+    if (offset < 0 && offset > closestOffset) {
+      closestOffset = offset;
+      closestTask = task;
     }
+  });
 
-    const inputBorrar = document.createElement('input')
-    inputBorrar.classList.add('btn-borrar')
-    inputBorrar.setAttribute('type', 'submit')
-    inputBorrar.value = 'Borrar'
-    inputBorrar.onclick = function() {
-        divTarea.remove()
-    }
-
-    divTarea.appendChild(pNombre)
-    divTarea.appendChild(pDescripcion)
-    divTarea.appendChild(pResponsable)
-    divTarea.appendChild(inputEditar)
-    divTarea.appendChild(inputBorrar)
-    pendientes.appendChild(divTarea)
-}
-
-function editarTarea() {
-    const btnEditar = document.getElementById("btn-crear-editar")
-    btnEditar.value = "Editar Tarea"
-    btnEditar.classList.remove('btn-crear')
-    btnEditar.classList.add('btn-editar')
-
-    document.getElementById("tarea-nombre").value = tarea.nombre
-    document.getElementById("tarea-descripcion").value = tarea.descripcion
-    document.getElementById("tarea-responsable").value = tarea.responsable
-}
+  return closestTask;
+};

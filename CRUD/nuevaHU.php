@@ -4,15 +4,16 @@ $nombreHU = $_POST['NombreHU'];
 $descripcionHU = $_POST['DescripcionHU'];
 $ph = $_POST['PH'];
 $responsableHU = $_POST['ResponsableHU'];
+$sprint = $_POST['SprintHU'];
 
 $fecha_actual = date("d-m-Y");
-$fecha = date("d-m-Y", strtotime($fecha_actual . " - 1 days"));
-// $estadoHU = 'Por hacer';
 
-$conexion -> query("INSERT INTO hu (Nombre, Descripcion, PH, Responsable, FechaCreacion, Estado) VALUES ('$nombreHU', '$descripcionHU', '$ph', '$responsableHU', '$fecha', 'Por hacer')") or die($conexion -> error); 
+
+
+$conexion -> query("INSERT INTO hu (Nombre, Descripcion, PH, Responsable, Sprint, FechaCreacion, Estado) VALUES ('$nombreHU', '$descripcionHU', '$ph', '$responsableHU', '$sprint', '$fecha_actual', 'Por hacer')") or die($conexion -> error); 
 
 if ($conexion) {
-    Header("Location: ../index.php");
+    Header("Location: ../Backlog.php");
 } else {
     echo "error";
 }
