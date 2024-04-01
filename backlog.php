@@ -1,6 +1,7 @@
 <?php
 session_start();
 include 'ConexionBD/conexion.php';
+
 $historiasUsuario = "SELECT * FROM hu";
 $resultado = $conexion->query($historiasUsuario);
 $queryUsuarios = "SELECT Usuario FROM usuarios";
@@ -14,9 +15,11 @@ $totalSprints = $mostrarSprint['TotalSprint']
 <head>
     <meta charset="utf-8">
     <title>CorsolaCorp: Backlog</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body id="page-top">
+    <?php include 'alertas.php' ?>
     <div id="wrapper">
         <?php include 'Sidebar.html' ?>
         <div id="content-wrapper" class="d-flex flex-column" style="background-color: #90AFC5;">
@@ -49,9 +52,7 @@ $totalSprints = $mostrarSprint['TotalSprint']
                                                         <div class="row">
                                                             <div class="col-sm-5">
                                                                 <div class="btn-group btn-group-sm" role="group">
-                                                                    <button type="button" class="btn">
-                                                                        HU: <?php echo $mostrar["numeroHU"]; ?>
-                                                                    </button>
+                                                                    <h6>HU: <?php echo $mostrar["numeroHU"]; ?></h6>
                                                                 </div>
                                                             </div>
                                                             <div class="col-sm-7">
@@ -60,6 +61,9 @@ $totalSprints = $mostrarSprint['TotalSprint']
                                                                         Opciones
                                                                     </button>
                                                                     <div class="dropdown-menu">
+                                                                        <!-- <form action="kanban.php?numeroHU=<?php echo $mostrar['numeroHU'] ?>" method="POST">
+                                                                            <input type="submit" value="Tablero">
+                                                                        </form> -->
                                                                         <a class="dropdown-item" href="kanban.php?numeroHU=<?php echo $mostrar['numeroHU'] ?>">Añadir al Tablero</a>
                                                                         <a class="dropdown-item" href="#">Editar</a>
                                                                         <a class="dropdown-item" href="CRUD/eliminarHU.php?id=<?php echo $mostrar['numeroHU'] ?>">Eliminar</a>
@@ -68,8 +72,9 @@ $totalSprints = $mostrarSprint['TotalSprint']
                                                             </div>
                                                         </div>
                                                         <hr>
-                                                        <h5 class="card-title text-center"><?php echo $mostrar["Nombre"]; ?></h5>
-                                                        <p class="card-text">Descripción: <?php echo $mostrar["Descripcion"]; ?></p>
+                                                        <h6 class="card-title text-center"><?php echo $mostrar["Nombre"]; ?></h6>
+                                                        <hr>
+                                                        <h6 class="card-text">Descripción: <?php echo $mostrar["Descripcion"]; ?></h6>
                                                     </div>
                                                     <ul class="list-group list-group-flush">
                                                         <li class="list-group-item">PH: <?php echo $mostrar["PH"]; ?></li>

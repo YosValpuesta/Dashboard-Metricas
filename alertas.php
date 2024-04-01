@@ -87,3 +87,5 @@ if (isset($_SESSION['inicioDenegado'])) {
     <?php
         unset($_SESSION['inicioDenegado']);
     }
+
+    
