@@ -1,6 +1,6 @@
 <?php
 include '../../ConexionBD/conexion.php';
-$id = $_REQUEST['id'];
+$id = $_REQUEST['numeroHU'];
 
 $historiasUsuario = "DELETE FROM hu_tablero WHERE numeroHU = '$id'";
 $resultado = $conexion->query($historiasUsuario);

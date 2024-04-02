@@ -1,8 +1,14 @@
 <?php
 session_start();
 include 'ConexionBD/conexion.php';
+
 $resultado = $conexion->query("SELECT * FROM tablero") or die($conexion->error);
 $mostrar = mysqli_fetch_array($resultado);
+
+//Conteo HU
+$queryConteoHU = $conexion->query("SELECT COUNT(*) AS totalHU FROM hu") or die($conexion->error);
+$resultadoConteoHU = $queryConteoHU->fetch_assoc();
+$totalHU = $resultadoConteoHU['totalHU'];
 ?>
 
 <head>
@@ -32,7 +38,7 @@ $mostrar = mysqli_fetch_array($resultado);
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Backlog</div>
                                             <div class="h6 mb-0 font-weight-bold text-gray-800">
-
+                                                <?php echo $totalHU; ?>
                                             </div>
                                         </div>
                                         <div class="col-auto">

@@ -8,8 +8,6 @@ $sprint = $_POST['SprintHU'];
 
 $fecha_actual = date("d-m-Y");
 
-
-
 $conexion -> query("INSERT INTO hu (Nombre, Descripcion, PH, Responsable, Sprint, FechaCreacion, Estado) VALUES ('$nombreHU', '$descripcionHU', '$ph', '$responsableHU', '$sprint', '$fecha_actual', 'Backlog')") or die($conexion -> error); 
 
 if ($conexion) {

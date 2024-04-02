@@ -2,97 +2,18 @@
 include 'ConexionBD/conexion.php';
 session_start();
 
-// Verificar si existe una sesión de usuario
-if (isset($_SESSION['Usuario'])) {
-    // Verificar si se ha enviado una HU para agregar
-    if (isset($_GET['numeroHU'])) {
-        $numeroHU = $_GET['numeroHU'];
-
-        // Verificar si la HU ya está agregada a la sesión
-        if (isset($_SESSION['HU'])) {
-            $arreglo = $_SESSION['HU'];
-            $encontro = false;
-            foreach ($arreglo as $hu) {
-                if ($hu['IdHU'] == $numeroHU) {
-                    $encontro = true;
-                    break;
-                }
-            }
-            if ($encontro) {
-                $_SESSION['error'] = 'La HU ya está agregada';
-                header("Location: backlog.php");
-                exit();
-            }
-        }
-
-        $resultado = $conexion->query('SELECT * FROM hu WHERE numeroHU = ' . $_GET['numeroHU']) or die($conexion->error);
-        $mostrar = mysqli_fetch_row($resultado);
-        $nombreHU = $mostrar[1];
-        $puntosH = $mostrar[3];
-        $responsableHU = $mostrar[4];
-        $estadoHU = $mostrar[8];
-
-        $resultado = [
-            'IdHU' => $_GET['numeroHU'],
-            'Nombre' => $nombreHU,
-            'PH' => $puntosH,
-            'Responsable' => $responsableHU,
-            'Estado' => $estadoHU
-        ];
-
-        $estadoHU = 'Por Hacer';
-
-        if ($resultado) {
-            // Agregar la HU a la sesión
-            $arregloNuevo = array(
-                'IdHU' => $_GET['numeroHU'],
-                'Nombre' => $nombreHU,
-                'PH' => $puntosH,
-                'Responsable' => $responsableHU,
-                'Estado' => $estadoHU
-            );
-            $_SESSION['HU'][] = $arregloNuevo;
-
-
-            // Guardar la HU en la base de datos
-            $queryInsert = "INSERT INTO hu_tablero (numeroHU, nombre, puntos, responsable, estado) VALUES ('$numeroHU', '$nombreHU', '$puntosH', '$responsableHU', '$estadoHU')";
-
-            $conexion->query($queryInsert) or die($conexion->error);
-        }
-    }
-}
-
-// Recuperar las HU al iniciar sesión
-if (isset($_SESSION['Usuario'])) {
-    if (!isset($_SESSION['HU'])) {
-        // Consultar las HU desde la base de datos
-        $querySelect = "SELECT * FROM hu_tablero";
-        $resultSelect = $conexion->query($querySelect) or die($conexion->error);
-
-        $arreglo = [];
-        while ($row = mysqli_fetch_assoc($resultSelect)) {
-            // Obtener el estado directamente de la fila en la base de datos
-            $estadoHU = $row['estado'];
-
-            $arreglo[] = [
-                'IdHU' => $row['numeroHU'],
-                'Nombre' => $row['nombre'],
-                'PH' => $row['puntos'],
-                'Responsable' => $row['responsable'],
-                'Estado' => $estadoHU
-            ];
-        }
-
-        $_SESSION['HU'] = $arreglo;
-    }
-}
+//Limite WIP
+$resultado = $conexion->query("SELECT * FROM metricawip") or die($conexion->error);
+$WIP = mysqli_fetch_assoc($resultado);
+$PorHacerWIP = $WIP['valorPorHacer'];
+$HaciendoWIP = $WIP['valorHaciendo'];
+$TerminadoWIP = $WIP['valorTerminado'];
 ?>
 
 <head>
     <meta charset="utf-8">
     <title>CorsolaCorp: Tablero kanban</title>
     <link rel="stylesheet" href="css/styles.css" />
-    <!-- <script src="js/drag.js" defer></script> -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
@@ -106,32 +27,33 @@ if (isset($_SESSION['Usuario'])) {
                 <div class="row lanes">
 
                     <div class="col-sm-4 swim-lane" id="PorHacer">
+
                         <div class="card-header" style="background-color: burlywood; border-radius: 16px; padding: 9px;">
-                            <h4 class="card-title heading text-center">Por hacer</h4>
+                            <h4 class="card-title heading text-center">Por hacer : (<?php echo $PorHacerWIP ?>)</h4>
                         </div>
                         <hr>
                         <div class="card-body">
                             <?php
-                            if (isset($_SESSION['HU'])) {
-                                $arregloHU = $_SESSION['HU'];
-                                foreach ($arregloHU as $hu) {
-                                    if ($hu['Estado'] == 'Por Hacer') {  // Filtrar por estado "Por hacer"
+                            $resultado = $conexion->query("SELECT * FROM hu_tablero WHERE estado = 'Por Hacer'") or die($conexion->error);
+                            while ($mostrarHU = mysqli_fetch_assoc($resultado)) {
+
                             ?>
-                                        <div class="card" id="hu_<?php echo $hu["IdHU"]; ?>">
-                                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-                                                <h5><?php echo $hu["IdHU"]; ?>: <?php echo $hu["Nombre"]; ?></h5>
-                                            </button>
-                                            <div>
-                                                Estado: <?php echo $hu["Estado"]; ?>
-                                            </div>
-                                            <div class="card-footer text-center">
-                                                <button type="button" class="btn btn-sm btn-outline-success" onclick="comenzarHU(<?php echo $hu["IdHU"]; ?>)">Comenzar HU</button>
-                                            </div>
-                                        </div>
-                                        <br>
+                                <div class="card" id="HU">
+                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                                        <h5><?php echo $mostrarHU['numeroHU'] ?> : <?php echo $mostrarHU['nombre'] ?></h5>
+                                    </button>
+                                    <!-- <div>
+                                        Estado: <?php echo $mostrarHU['estado'] ?>
+                                    </div>
+                                    <div>
+                                        Fecha: <?php echo $mostrarHU['FechaAgregada'] ?>
+                                    </div> -->
+                                    <div class="card-footer text-center">
+                                        <button type="button" class="btn btn-sm btn-outline-success" onclick="comenzarHU(<?php echo $mostrarHU['numeroHU'] ?>)">Comenzar HU</button>
+                                    </div>
+                                </div>
+                                <br>
                             <?php
-                                    }
-                                }
                             }
                             ?>
                         </div>
@@ -139,43 +61,72 @@ if (isset($_SESSION['Usuario'])) {
 
                     <div class="col-sm-4 swim-lane" id="EnProgreso">
                         <div class="card-header" style="background-color: burlywood; border-radius: 16px; padding: 9px;">
-                            <h4 class="card-title heading text-center">En progreso</h4>
+                            <h4 class="card-title heading text-center">En progreso : (<?php echo $HaciendoWIP ?>)</h4>
                         </div>
                         <hr>
                         <div class="card-body">
                             <?php
-                            if (isset($_SESSION['HU'])) {
-                                $arregloHU = $_SESSION['HU'];
-                                foreach ($arregloHU as $hu) {
-                                    if ($hu['Estado'] == 'En progreso') {  // Filtrar por estado "En progreso"
+                            // Consultar la base de datos para obtener las HU en estado "Por Hacer"
+                            $resultado = $conexion->query("SELECT * FROM hu_tablero WHERE estado = 'En progreso'") or die($conexion->error);
+                            while ($mostrarHU = mysqli_fetch_assoc($resultado)) {
                             ?>
-                                        <div class="card" id="hu_<?php echo $hu["IdHU"]; ?>">
-                                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-                                                <h5><?php echo $hu["IdHU"]; ?>: <?php echo $hu["Nombre"]; ?></h5>
-                                            </button>
-                                            <div>
-                                                Estado: <?php echo $hu["Estado"]; ?>
-                                            </div>
-                                            <div class="card-footer text-center">
-                                                <button type="button" class="btn btn-sm btn-outline-success" onclick="comenzarHU(<?php echo $hu["IdHU"]; ?>)">Comenzar HU</button>
-                                            </div>
-                                        </div>
-                                        <br>
+                                <div class="card" id="HU">
+                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                                        <h5><?php echo $mostrarHU['numeroHU'] ?> : <?php echo $mostrarHU['nombre'] ?></h5>
+                                    </button>
+                                    <!-- <div>
+                                        Estado: <?php echo $mostrarHU['estado'] ?>
+                                    </div>
+                                    <div>
+                                        Fecha: <?php echo $mostrarHU['FechaAgregada'] ?>
+                                    </div> -->
+                                    <div class="card-footer text-center">
+                                        <button type="button" class="btn btn-sm btn-outline-success" onclick="finalizarHU(<?php echo $mostrarHU['numeroHU'] ?>)">Finalizar HU</button>
+                                    </div>
+                                </div>
+                                <br>
                             <?php
-                                    }
-                                }
                             }
                             ?>
                         </div>
                     </div>
+
+                    <div class="col-sm-3 swim-lane" id="Terminada">
+                        <div class="card-header" style="background-color: burlywood; border-radius: 16px; padding: 9px;">
+                            <h4 class="card-title heading text-center">Terminado: (<?php echo $TerminadoWIP ?>)</h4>
+                        </div>
+                        <hr>
+                        <div class="card-body">
+                            <?php
+                            // Consultar la base de datos para obtener las HU en estado "Por Hacer"
+                            $resultado = $conexion->query("SELECT * FROM hu_tablero WHERE estado = 'Terminada'") or die($conexion->error);
+                            while ($mostrarHU = mysqli_fetch_assoc($resultado)) {
+                            ?>
+                                <div class="card" id="HU">
+                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                                        <h5><?php echo $mostrarHU['numeroHU'] ?> : <?php echo $mostrarHU['nombre'] ?></h5>
+                                    </button>
+                                    <!-- <div>
+                                        Estado: <?php echo $mostrarHU['estado'] ?>
+                                    </div>
+                                    <div>
+                                        Fecha: <?php echo $mostrarHU['FechaAgregada'] ?>
+                                    </div> -->
+
+                                </div>
+                                <br>
+                            <?php
+                            }
+                            ?>
+                        </div>
+                    </div>
+
                 </div>
             </div>
             <?php include 'footer.html' ?>
         </div>
     </div>
 </body>
-
-<!-- <p class="task" draggable="true"></p> -->
 
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -217,54 +168,57 @@ if (isset($_SESSION['Usuario'])) {
 </div>
 
 <script>
-    function comenzarHU(idHU) {
-        // Aquí puedes hacer una petición AJAX para actualizar el estado en la base de datos
-        // y luego mover la tarjeta a la columna "En progreso" en la interfaz
-
-        // Ejemplo de solicitud AJAX con jQuery
+    function comenzarHU(numeroHU) {
+        // Enviar la solicitud AJAX
         $.ajax({
-            url: 'CRUD/tablero/actualizarEstadoHU.php', // URL del script PHP que actualiza el estado
-            method: 'POST',
+            type: 'POST',
+            url: 'CRUD/tablero/actualizarEstadoHU.php',
             data: {
-                idHU: idHU,
-                nuevoEstado: 'En progreso'
+                numeroHU: numeroHU
             },
+            dataType: 'json',
             success: function(response) {
+                console.log(response); // Imprimir la respuesta en la consola para depurar
                 if (response.success) {
-                    // Si la actualización en la base de datos fue exitosa
-                    // Mover la tarjeta a la columna "En progreso"
-                    var tarjeta = $('#hu_' + idHU);
-                    tarjeta.appendTo('#Progreso .card-body');
+                    // Actualizar la interfaz de usuario
+                    alert('La HU se ha movido a "En progreso"');
+                    location.reload(); // Recargar la página para reflejar los cambios
                 } else {
-                    console.error(response.message); // Mostrar mensaje de error si es necesario
+                    location.reload();
                 }
             },
             error: function(xhr, status, error) {
-                console.error(error); // Manejar errores de la solicitud AJAX
+                console.error(error);
+                location.reload();
             }
         });
     }
 </script>
 
-
-
-<!-- <script>
-    function eliminarHU(idHU) {
-    var xhr = new XMLHttpRequest();
-    xhr.open("GET", "CRUD/tablero/eliminarTablero.php?id=" + idHU, true);
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            var response = JSON.parse(xhr.responseText);
-            if (response.success) {
-                // La eliminación se realizó correctamente, recargar la página
+<script>
+    function finalizarHU(numeroHU) {
+        // Enviar la solicitud AJAX
+        $.ajax({
+            type: 'POST',
+            url: 'CRUD/tablero/finalizarHU.php',
+            data: {
+                numeroHU: numeroHU
+            },
+            dataType: 'json',
+            success: function(response) {
+                console.log(response); // Imprimir la respuesta en la consola para depurar
+                if (response.success) {
+                    // Actualizar la interfaz de usuario
+                    alert('La HU se ha movido a "Terminado"');
+                    location.reload(); // Recargar la página para reflejar los cambios
+                } else {
+                    location.reload();
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
                 location.reload();
-            } else {
-                // Error al eliminar la HU, mostrar mensaje de error si es necesario
-                console.error(response.message);
             }
-        }
-    };
-    xhr.send();
-}
-
-</script> -->
+        });
+    }
+</script>

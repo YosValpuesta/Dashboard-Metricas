@@ -61,11 +61,8 @@ $totalSprints = $mostrarSprint['TotalSprint']
                                                                         Opciones
                                                                     </button>
                                                                     <div class="dropdown-menu">
-                                                                        <!-- <form action="kanban.php?numeroHU=<?php echo $mostrar['numeroHU'] ?>" method="POST">
-                                                                            <input type="submit" value="Tablero">
-                                                                        </form> -->
-                                                                        <a class="dropdown-item" href="kanban.php?numeroHU=<?php echo $mostrar['numeroHU'] ?>">Añadir al Tablero</a>
-                                                                        <a class="dropdown-item" href="#">Editar</a>
+                                                                        
+                                                                        <a class="dropdown-item" href="CRUD/tablero/añadirTablero.php?numeroHU=<?php echo $mostrar['numeroHU'] ?>">Añadir al Tablero</a>
                                                                         <a class="dropdown-item" href="CRUD/eliminarHU.php?id=<?php echo $mostrar['numeroHU'] ?>">Eliminar</a>
                                                                     </div>
                                                                 </div>
@@ -73,8 +70,6 @@ $totalSprints = $mostrarSprint['TotalSprint']
                                                         </div>
                                                         <hr>
                                                         <h6 class="card-title text-center"><?php echo $mostrar["Nombre"]; ?></h6>
-                                                        <hr>
-                                                        <h6 class="card-text">Descripción: <?php echo $mostrar["Descripcion"]; ?></h6>
                                                     </div>
                                                     <ul class="list-group list-group-flush">
                                                         <li class="list-group-item">PH: <?php echo $mostrar["PH"]; ?></li>
